@@ -1,4 +1,5 @@
 import UserService from "../services/UserService.js";
+import userService from "../services/UserService.js";
 
 class UserController {
     async register(req, res) {
@@ -6,7 +7,7 @@ class UserController {
             const { email, name, password } = req.body
             const userData = await UserService.register(email, name, password)
 
-            res.cookie('refreshToken', userData.refreshToken, {maxAge: 60 * 24 * 60 * 1000, httpOnly: true})
+            res.cookie('refreshToken', userData.refreshToken, {maxAge: process.env.REFRESH_TOKEN_EXPIRES * 24 * 60 * 1000, httpOnly: true})
             return res.json(userData)
         } catch (e) {
             return res.json(e.message)
@@ -31,7 +32,9 @@ class UserController {
 
     async activate(req, res) {
         try {
-
+            const activationLink = req.params.link
+            await userService.activate(activationLink)
+            return res.redirect(`${process.env.CLIENT_URL}/events`)
         } catch (e) {
 
         }
