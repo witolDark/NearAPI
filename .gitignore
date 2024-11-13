@@ -1,5 +1,5 @@
 .idea/
-.env
+/.env
 /node_modules/.bin/mime
 /node_modules/.bin/mime.cmd
 /node_modules/.bin/nodemon
