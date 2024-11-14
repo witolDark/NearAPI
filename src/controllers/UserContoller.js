@@ -4,10 +4,13 @@ import userService from "../services/UserService.js";
 class UserController {
     async register(req, res) {
         try {
-            const { email, name, password } = req.body
+            const {email, name, password} = req.body
             const userData = await UserService.register(email, name, password)
 
-            res.cookie('refreshToken', userData.refreshToken, {maxAge: process.env.REFRESH_TOKEN_EXPIRES * 24 * 60 * 1000, httpOnly: true})
+            res.cookie('refreshToken', userData.refreshToken, {
+                maxAge: process.env.REFRESH_TOKEN_EXPIRES * 24 * 60 * 1000,
+                httpOnly: true
+            })
             return res.json(userData)
         } catch (e) {
             return res.json(e.message)
@@ -16,7 +19,14 @@ class UserController {
 
     async login(req, res) {
         try {
+            const {email, password} = req.body;
+            const userData = await UserService.login(email, password)
 
+            res.cookie('refreshToken', userData.refreshToken, {
+                maxAge: process.env.REFRESH_TOKEN_EXPIRES * 24 * 60 * 1000,
+                httpOnly: true
+            })
+            return res.json(userData)
         } catch (e) {
 
         }

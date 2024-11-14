@@ -9,7 +9,7 @@ import authRouter from "./src/routes/AuthRouter.js";
 const app = express()
 dotenv.config()
 const DB_URL = process.env.DB_URL
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT
 
 
 app.use(express.json())
