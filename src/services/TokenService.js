@@ -3,8 +3,8 @@ import Token from "../models/Token.js";
 
 class TokenService {
     generateTokens(payload) {
-        const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_KEY, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES });
-        const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_KEY, { expiresIn: process.env.REFRESH_TOKEN_EXPIRES });
+        const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_KEY, {expiresIn: process.env.ACCESS_TOKEN_EXPIRES});
+        const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_KEY, {expiresIn: process.env.REFRESH_TOKEN_EXPIRES});
 
         return {
             accessToken: accessToken,
@@ -18,6 +18,34 @@ class TokenService {
         if (tokenData) {
             tokenData.refreshToken = refreshToken
             return tokenData.save()
+        }
+    }
+
+    async removeToken(refreshToken) {
+        return Token.deleteOne({refreshToken});
+    }
+
+    async validateRefreshToken(token) {
+        try {
+            return jwt.verify(token, process.env.REFRESH_TOKEN_KEY)
+        } catch (e) {
+            return null
+        }
+    }
+
+    async validateAccessToken(token) {
+        try {
+            return jwt.verify(token, process.env.ACCESS_TOKEN_KEY)
+        } catch (e) {
+            return null
+        }
+    }
+
+    async findToken(token) {
+        try {
+            return await Token.findOne({token})
+        } catch (e) {
+
         }
     }
 }

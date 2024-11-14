@@ -1,13 +1,13 @@
-import UserModel from "../models/User.js";
+import User from "../models/User.js";
 import bcrypt from 'bcrypt'
-import { v4 as uuidv4 } from "uuid";
+import {v4 as uuidv4} from "uuid";
 import MailService from "./MailService.js";
 import tokenService from "./TokenService.js";
 import {UserDTO} from "../dtos/UserDTO.js";
 
 class UserService {
     async register(email, name, password) {
-        const candidate = await UserModel.findOne({email})
+        const candidate = await User.findOne({email})
         if (candidate) {
             throw new Error('Такий користувач вже існує')
         }
@@ -15,7 +15,13 @@ class UserService {
 
         const activationLink = uuidv4()
 
-        const user = await UserModel.create({email, name, passwordHash: passwordHash, registerDate: Date.now(), activationLink: activationLink})
+        const user = await User.create({
+            email,
+            name,
+            passwordHash: passwordHash,
+            registerDate: Date.now(),
+            activationLink: activationLink
+        })
 
         await MailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`)
 
@@ -31,7 +37,7 @@ class UserService {
     }
 
     async activate(activationLink) {
-        const user = await UserModel.findOne({activationLink})
+        const user = await User.findOne({activationLink})
 
         if (!user) {
             throw new Error('Невірне посилання')
@@ -42,7 +48,7 @@ class UserService {
     }
 
     async login(email, password) {
-        const user = await UserModel.findOne({email})
+        const user = await User.findOne({email})
 
         if (!user) {
             throw new Error(`Пошта або пароль невірні, перевірте правильність даних`)
@@ -56,6 +62,33 @@ class UserService {
 
         const userDto = new UserDTO(user)
         const tokens = tokenService.generateTokens({...userDto})
+        await tokenService.saveToken(userDto.id, tokens.refreshToken)
+
+        return {
+            ...tokens,
+            user: userDto
+        }
+    }
+
+    async logout(refreshToken) {
+        return await tokenService.removeToken(refreshToken)
+    }
+
+    async refresh(refreshToken) {
+        if (!refreshToken) {
+            throw new Error("Не авторизовано")
+        }
+
+        const userData = tokenService.validateRefreshToken(refreshToken)
+        const tokenDb = await tokenService.findToken(refreshToken)
+
+        if (!userData || !tokenDb) {
+            throw new Error("Не авторизовано")
+        }
+
+        const user = await User.findById(userData.id)
+        const userDto = new UserDTO(user)
+        const tokens = tokenService.saveToken()
         await tokenService.saveToken(userDto.id, tokens.refreshToken)
 
         return {
