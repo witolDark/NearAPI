@@ -9,7 +9,7 @@ const Event = new mongoose.Schema({
     endDate: {type: Date, required: true},
     ticketRequired: {type: Boolean, default: false},
     ticketUrl: {type: String, required: function() { return this.ticketRequired; }},
-    status: {type: String, enum: [Status.INACTIVE, Status.ACTIVE, Status.UPCOMING]}
+    status: {type: String, enum: [Status.INACTIVE, Status.ACTIVE, Status.UPCOMING, Status.PENDING, Status.CANCELLED]}
 })
 
 export default mongoose.model('Event', Event);

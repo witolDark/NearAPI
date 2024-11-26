@@ -1,7 +1,9 @@
 const Status = {
     UPCOMING: 'upcoming',
     ACTIVE: 'active',
-    INACTIVE: 'inactive'
+    INACTIVE: 'inactive',
+    PENDING: 'pending',
+    CANCELLED: 'canceled'
 }
 
 export default Status;
