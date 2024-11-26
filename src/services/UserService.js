@@ -8,7 +8,8 @@ import {UserDTO} from "../dtos/UserDTO.js";
 class UserService {
     async register(email, name, password) {
         const candidate = await User.findOne({email})
-        if (candidate) {
+
+        if (candidate && candidate.isActivated) {
             throw new Error('Такий користувач вже існує')
         }
         const passwordHash = await bcrypt.hash(password, 10)
@@ -44,7 +45,18 @@ class UserService {
         }
 
         user.isActivated = true
+
+        const userDto = new UserDTO(user)
+
+        const tokens = tokenService.generateTokens({...userDto})
+        await tokenService.saveToken(userDto.id, tokens.refreshToken)
+
         await user.save()
+
+        return {
+            ...tokens,
+            user: userDto
+        }
     }
 
     async login(email, password) {

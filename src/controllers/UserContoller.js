@@ -1,68 +1,64 @@
 import userService from "../services/UserService.js"
 
 class UserController {
-    async register(req, res) {
+    async register(request, response) {
         try {
-            const {email, name, password} = req.body
-            const userData = await userService.register(email, name, password)
+            const {email, name, password} = request.body
+            await userService.register(email, name, password)
 
-            res.cookie('refreshToken', userData.refreshToken, {
-                maxAge: process.env.REFRESH_TOKEN_EXPIRES * 24 * 60 * 1000,
-                httpOnly: true
-            })
-            return res.json(userData)
+            return response.status(200)
         } catch (e) {
-            return res.json(e.message)
+            return response.json(e.message)
         }
     }
 
-    async login(req, res) {
+    async login(request, response) {
         try {
-            const {email, password} = req.body
+            const {email, password} = request.body
             const userData = await userService.login(email, password)
 
-            res.cookie('refreshToken', userData.refreshToken, {
+            response.cookie('refreshToken', userData.refreshToken, {
                 maxAge: process.env.REFRESH_TOKEN_EXPIRES * 24 * 60 * 1000,
                 httpOnly: true
             })
-            return res.json(userData)
+            return response.json(userData)
         } catch (e) {
 
         }
     }
 
-    async logout(req, res) {
+    async logout(request, response) {
         try {
-            const {refteshToken} = req.cookies
+            const {refteshToken} = request.cookies
             const token = await userService.logout(refteshToken)
-            res.clearCookie('refreshToken')
-            return res.json(token)
+            response.clearCookie('refreshToken')
+            return response.json(token)
         } catch (e) {
 
         }
     }
 
-    async activate(req, res) {
+    async activate(request, response) {
         try {
-            const activationLink = req.params.link
+            const activationLink = request.params.link
             await userService.activate(activationLink)
-            return res.redirect(`${process.env.CLIENT_URL}/confirmation`)
+            return response.redirect(`${process.env.CLIENT_URL}/main/events`)
         } catch (e) {
 
         }
     }
 
-    async refresh(req, res) {
+    async refresh(request, response) {
         try {
-            const {refteshToken} = req.cookies
+            const {refteshToken} = request.cookies
             const userData = await userService.refresh(refteshToken)
-            res.cookie('refreshToken', userData.refreshToken, {
+            request.cookie('refreshToken', userData.refreshToken, {
                 maxAge: process.env.REFRESH_TOKEN_EXPIRES * 24 * 60 * 1000,
                 httpOnly: true
             })
-            return res.json(userData)
+            return response.json(userData)
         } catch (e) {
-
+            response.json(e.message)
         }
     }
 }
