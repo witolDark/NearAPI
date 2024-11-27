@@ -4,13 +4,9 @@ class UserController {
     async register(request, response) {
         try {
             const {email, name, password} = request.body
-            const userData = await userService.register(email, name, password)
+            await userService.register(email, name, password)
 
-            response.cookie('refreshToken', userData.refreshToken, {
-                maxAge: process.env.REFresponseH_TOKEN_EXPIresponse * 24 * 60 * 1000,
-                httpOnly: true
-            })
-            return response.json(userData)
+            return response.status(200)
         } catch (e) {
             return response.json(e.message)
         }
@@ -21,10 +17,6 @@ class UserController {
             const {email, password} = request.body
             const userData = await userService.login(email, password)
 
-            response.cookie('refreshToken', userData.refreshToken, {
-                maxAge: process.env.REFresponseH_TOKEN_EXPIresponse * 24 * 60 * 1000,
-                httpOnly: true
-            })
             return response.json(userData)
         } catch (e) {
 
@@ -46,7 +38,7 @@ class UserController {
         try {
             const activationLink = request.params.link
             await userService.activate(activationLink)
-            return response.redirect(`${process.env.CLIENT_URL}/confirmation`)
+            return response.redirect(`${process.env.CLIENT_URL}/auth/login`)
         } catch (e) {
 
         }
@@ -56,15 +48,14 @@ class UserController {
         try {
             const {refreshToken} = request.cookies
             const userData = await userService.refresh(refreshToken)
-            response.cookie('refreshToken', userData.refreshToken, {
-                maxAge: process.env.REFresponseH_TOKEN_EXPIresponse * 24 * 60 * 1000,
-                httpOnly: true
-            })
+
             return response.json(userData)
         } catch (e) {
 
         }
     }
+
+    async
 }
 
 export default new UserController();

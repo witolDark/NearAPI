@@ -25,7 +25,7 @@ class TokenService {
         return Token.deleteOne({refreshToken});
     }
 
-    async validateRefreshToken(token) {
+    validateRefreshToken(token) {
         try {
             return jwt.verify(token, process.env.REFRESH_TOKEN_KEY)
         } catch (e) {
@@ -33,7 +33,7 @@ class TokenService {
         }
     }
 
-    async validateAccessToken(token) {
+    validateAccessToken(token) {
         try {
             return jwt.verify(token, process.env.ACCESS_TOKEN_KEY)
         } catch (e) {
@@ -41,9 +41,10 @@ class TokenService {
         }
     }
 
+
     async findToken(token) {
         try {
-            return await Token.findOne({token})
+            return Token.findOne({token})
         } catch (e) {
 
         }

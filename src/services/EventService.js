@@ -1,41 +1,57 @@
 import Status from "../shared/Status.js";
+import Event from "../models/Event.js";
+import {EventDTO} from "../dtos/EventDTO.js";
 
 class EventService {
-    async addEvent(creator, title, description, startDate, endDate, ticketRequired, ticketUrl) {
-        return await Event.create({
+    async addEvent(creator, title, description, startDate, endDate, location, ticketRequired, ticketUrl) {
+        const event = await Event.create({
             creator: creator,
             title: title,
             description: description,
             startDate: startDate,
             endDate: endDate,
+            location: location,
             ticketRequired: ticketRequired,
-            ticketUrl: ticketUrl,
-            status: Status.PENDING
-        })
+            ticketUrl: ticketUrl
+        });
+
+        return new EventDTO(event);
     }
 
     async approveEvent(id) {
         const event = await Event.findById(id);
 
         event.status = this.getStatusByDate(event.startDate, event.endDate);
+        event.save()
     }
 
     async cancelEvent(id) {
         const event = await Event.findById(id);
 
         event.status = Status.CANCELLED;
+        event.save()
     }
 
     async getEvent(id) {
-        return await Event.findById(id);
+        const event = await Event.findById(id);
+
+        return new EventDTO(event);
     }
 
     async getEventsByCreator(creator) {
-        return await Event.find({creator: creator});
+        return Event.find({creator: creator});
     }
 
     async getAllEvents() {
-        return await Event.find();
+        return Event.find({
+            status: { $nin: [Status.PENDING, Status.CANCELLED] }
+        });
+    }
+
+    async getAllPendings() {
+        return Event.find({
+            status: Status.PENDING
+        });
     }
 
     async deleteEvent(id) {
@@ -45,9 +61,9 @@ class EventService {
     }
 
     getStatusByDate(startDate, endDate) {
-        if (startDate < Date.now() && endDate > Date.now()) {
+        if (new Date(startDate) < Date.now() && new Date(endDate) > Date.now()) {
             return Status.ACTIVE
-        } else if (startDate > Date.now()) {
+        } else if (new Date(startDate) > Date.now()) {
             return Status.UPCOMING
         } else {
             return Status.INACTIVE
