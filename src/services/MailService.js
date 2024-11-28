@@ -21,7 +21,7 @@ class MailService {
             from: process.env.SMTP_USER,
             to: to,
             subject: 'Активація NearU',
-            text: link
+            text: `На вашу адресу було зареєстровано профіль, посилання для підтвердження: ${link}`
         })
     }
 }

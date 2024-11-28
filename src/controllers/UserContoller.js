@@ -54,8 +54,6 @@ class UserController {
 
         }
     }
-
-    async
 }
 
 export default new UserController();
