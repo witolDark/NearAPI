@@ -3,8 +3,8 @@ import EventService from "../services/EventService.js";
 class EventController {
     async create(request, response) {
         try {
-            const {creator, title, description, startDate, endDate, location, ticketRequired, ticketUrl} = request.body
-            const event = await EventService.addEvent(creator, title, description, startDate, endDate, location, ticketRequired, ticketUrl);
+            const {creator, title, description, startDate, startTime, endDate, endTime, location, ticketRequired, ticketUrl} = request.body
+            const event = await EventService.addEvent(creator, title, description, startDate, startTime, endDate, endTime, location, ticketRequired, ticketUrl);
 
             console.log(event)
             response.status(200).json(event)

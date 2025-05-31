@@ -3,13 +3,15 @@ import Event from "../models/Event.js";
 import {EventDTO} from "../dtos/EventDTO.js";
 
 class EventService {
-    async addEvent(creator, title, description, startDate, endDate, location, ticketRequired, ticketUrl) {
+    async addEvent(creator, title, description, startDate, startTime, endDate, endTime,location, ticketRequired, ticketUrl) {
         const event = await Event.create({
             creator: creator,
             title: title,
             description: description,
             startDate: startDate,
+            startTime: startTime,
             endDate: endDate,
+            endTime: endTime,
             location: location,
             ticketRequired: ticketRequired,
             ticketUrl: ticketUrl
