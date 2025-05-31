@@ -4,7 +4,9 @@ export class EventDTO {
     title;
     description;
     startDate;
+    startTime;
     endDate;
+    endTime;
     location;
     ticketRequired;
     ticketUrl;
@@ -16,7 +18,9 @@ export class EventDTO {
         this.title = model.title;
         this.description = model.description;
         this.startDate = model.startDate;
+        this.startTime = model.startTime;
         this.endDate = model.endDate;
+        this.endTime = model.endTime;
         this.location = model.location;
         this.ticketRequired = model.ticketRequired;
         this.ticketUrl = model.ticketUrl;
