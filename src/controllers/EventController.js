@@ -6,7 +6,6 @@ class EventController {
             const {creator, title, description, startDate, startTime, endDate, endTime, location, ticketRequired, ticketUrl} = request.body
             const event = await EventService.addEvent(creator, title, description, startDate, startTime, endDate, endTime, location, ticketRequired, ticketUrl);
 
-            console.log(event)
             response.status(200).json(event)
         } catch (e) {
             response.status(500).json(e)
@@ -90,6 +89,39 @@ class EventController {
             response.status(204).json("Ok");
         } catch (e) {
             response.status(500).json(e);
+        }
+    }
+
+    async leaveComment(request, response) {
+        try {
+            const { userId, eventId, text } = request.body
+            const comment = await EventService.leaveComment({userId, eventId, text});
+
+            response.status(200).json(comment)
+        } catch (e) {
+            response.status(500).json(e)
+        }
+    }
+
+    async getComments(request, response) {
+        try {
+            const { eventId } = request.body
+            const comments = await EventService.getComments({eventId});
+
+            response.status(200).json(comments)
+        } catch (e) {
+            response.status(500).json(e)
+        }
+    }
+
+    async deleteComment(request, response) {
+        try {
+            const { commentId, userId } = request.body
+            const result = await EventService.deleteComment({commentId, userId});
+
+            response.status(200).json(result)
+        } catch (e) {
+            response.status(500).json(e)
         }
     }
 }

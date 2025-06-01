@@ -1,9 +1,12 @@
 import Status from "../shared/Status.js";
 import Event from "../models/Event.js";
+import Comment from "../models/Comment.js";
 import {EventDTO} from "../dtos/EventDTO.js";
+import {CommentDTO} from "../dtos/CommentDTO.js";
+import UserService from "./UserService.js";
 
 class EventService {
-    async addEvent(creator, title, description, startDate, startTime, endDate, endTime,location, ticketRequired, ticketUrl) {
+    async addEvent(creator, title, description, startDate, startTime, endDate, endTime, location, ticketRequired, ticketUrl) {
         const event = await Event.create({
             creator: creator,
             title: title,
@@ -46,7 +49,7 @@ class EventService {
 
     async getAllEvents() {
         return Event.find({
-            status: { $nin: [Status.PENDING, Status.CANCELLED] }
+            status: {$nin: [Status.PENDING, Status.CANCELLED]}
         });
     }
 
@@ -59,7 +62,7 @@ class EventService {
     async deleteEvent(id) {
         const event = await Event.findById(id);
 
-        event.deleteOne({ _id: id })
+        event.deleteOne({_id: id})
     }
 
     getStatusByDate(startDate, endDate) {
@@ -70,6 +73,35 @@ class EventService {
         } else {
             return Status.INACTIVE
         }
+    }
+
+    async leaveComment(userId, eventId, text) {
+        const comment = await Comment.create({eventId, userId, text})
+
+        return new CommentDTO(comment);
+    }
+
+    async getComments(eventId) {
+        return Comment.find({eventId: eventId});
+    }
+
+    async deleteComment(commentId, userId) {
+        const user = await UserService.getUser(userId);
+        const comment = await Comment.findById(commentId);
+
+        if (!comment) {
+            throw new Error(`Could not find a comment with id ${commentId}`);
+        }
+
+        if (!user) {
+            throw new Error(`Could not find a user with id ${userId}`);
+        }
+
+        if (user._id.equals(comment.userId) || user.role === Role.ADMIN) {
+            return Comment.findByIdAndDelete(commentId)
+        }
+
+        throw new Error('No permission to delete');
     }
 }
 

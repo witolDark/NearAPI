@@ -108,6 +108,12 @@ class UserService {
             user: userDto
         }
     }
+
+    async getUser(userId) {
+        const user = await User.findOne({userId})
+
+        return new UserDTO(user)
+    }
 }
 
 export default new UserService();
