@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, {Schema} from 'mongoose';
 import Status from "../shared/Status.js";
 
 const EventSchema = new mongoose.Schema({
@@ -6,12 +6,13 @@ const EventSchema = new mongoose.Schema({
     title: {type: String, required: true},
     description: {type: String, required: true},
     startDate: {type: Date, required: true},
-    startTime: {type: String, required: true},
     endDate: {type: Date, required: true},
-    endTime: {type: String, required: true},
     location: {type: String, required: true},
     ticketRequired: {type: Boolean, default: false},
     ticketUrl: {type: String, required: function() { return this.ticketRequired; }},
+    rating: {type: Number, default: 0},
+    numberOfRatings: {type: Number, default: 0},
+    categoryId: {type: Schema.Types.ObjectId, ref: 'Category'},
     status: {
         type: String,
         enum: Object.values(Status),

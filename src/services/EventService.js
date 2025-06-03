@@ -4,20 +4,17 @@ import Comment from "../models/Comment.js";
 import {EventDTO} from "../dtos/EventDTO.js";
 import {CommentDTO} from "../dtos/CommentDTO.js";
 import UserService from "./UserService.js";
+import Role from "../shared/Role.js";
+import Group from "../models/Group.js";
+import {GroupDTO} from "../dtos/GroupDTO.js";
+import Review from "../models/Review.js";
+import {ReviewDTO} from "../dtos/ReviewDTO.js";
+import Category from "../models/Category.js";
 
 class EventService {
-    async addEvent(creator, title, description, startDate, startTime, endDate, endTime, location, ticketRequired, ticketUrl) {
+    async addEvent(eventData) {
         const event = await Event.create({
-            creator: creator,
-            title: title,
-            description: description,
-            startDate: startDate,
-            startTime: startTime,
-            endDate: endDate,
-            endTime: endTime,
-            location: location,
-            ticketRequired: ticketRequired,
-            ticketUrl: ticketUrl
+            ...eventData,
         });
 
         return new EventDTO(event);
@@ -38,31 +35,30 @@ class EventService {
     }
 
     async getEvent(id) {
-        const event = await Event.findById(id);
+        const event = await Event.findById(id).populate('categoryId').lean();
 
         return new EventDTO(event);
     }
 
     async getEventsByCreator(creator) {
-        return Event.find({creator: creator});
+        const events = await Event.find({creator: creator}).populate('categoryId').lean();
+        return events.map(event => new EventDTO(event));
     }
 
     async getAllEvents() {
         return Event.find({
             status: {$nin: [Status.PENDING, Status.CANCELLED]}
-        });
+        }).populate('categoryId').lean().map(event => new EventDTO(event));
     }
 
     async getAllPendings() {
         return Event.find({
             status: Status.PENDING
-        });
+        }).lean().map(event => new EventDTO(event));
     }
 
     async deleteEvent(id) {
-        const event = await Event.findById(id);
-
-        event.deleteOne({_id: id})
+        await Event.findByIdAndDelete(id);
     }
 
     getStatusByDate(startDate, endDate) {
@@ -75,14 +71,48 @@ class EventService {
         }
     }
 
-    async leaveComment(userId, eventId, text) {
-        const comment = await Comment.create({eventId, userId, text})
-
-        return new CommentDTO(comment);
+    async getCategories() {
+        return Category.find({}).lean();
     }
 
-    async getComments(eventId) {
-        return Comment.find({eventId: eventId});
+    async rateEvent({eventId, userId, rating, text}) {
+        const review = await Review.create({
+            eventId, userId, rating, text, date: Date.now()
+        });
+
+        const populatedReview = await Review.findById(review._id)
+            .populate('eventId')
+            .populate('userId')
+            .lean();
+
+        return new ReviewDTO(populatedReview);
+    }
+
+    async getReviewsByEventId(eventId) {
+        const reviews = await Review.find({eventId: eventId}).populate('eventId').populate('userId').lean();
+
+        return reviews.map(review => new ReviewDTO(review));
+    }
+
+    async getGroupsByEventId(eventId) {
+        return await Group.find({eventId: eventId}).populate('userId').lean().map(group => new GroupDTO(group));
+    }
+
+    async leaveComment(userId, groupId, text) {
+        const comment = await Comment.create({groupId, userId, text});
+        const user = await UserService.getUser(userId);
+        const group = await Group.findById(groupId);
+
+        return new CommentDTO({...comment, user, group});
+    }
+
+    async getCommentsByGroupId(groupId) {
+        const group = new GroupDTO(Group.findById({groupId}).lean());
+        const comments = Comment.find({groupId: groupId}).populate('userId').lean().map(comment => new CommentDTO(comment));
+        return {
+            group,
+            comments
+        }
     }
 
     async deleteComment(commentId, userId) {
@@ -98,7 +128,7 @@ class EventService {
         }
 
         if (user._id.equals(comment.userId) || user.role === Role.ADMIN) {
-            return Comment.findByIdAndDelete(commentId)
+            Comment.findByIdAndDelete(commentId)
         }
 
         throw new Error('No permission to delete');

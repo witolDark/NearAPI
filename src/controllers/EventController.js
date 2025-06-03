@@ -1,10 +1,11 @@
 import EventService from "../services/EventService.js";
+import {EventDTO} from "../dtos/EventDTO.js";
 
 class EventController {
     async create(request, response) {
         try {
-            const {creator, title, description, startDate, startTime, endDate, endTime, location, ticketRequired, ticketUrl} = request.body
-            const event = await EventService.addEvent(creator, title, description, startDate, startTime, endDate, endTime, location, ticketRequired, ticketUrl);
+            const eventData = new EventDTO(request.body)
+            const event = await EventService.addEvent(eventData);
 
             response.status(200).json(event)
         } catch (e) {
@@ -83,19 +84,62 @@ class EventController {
 
     async delete(request, response) {
         try {
-            const {id} = request.body
+            const {id} = request.params.id
             await EventService.deleteEvent(id)
 
-            response.status(204).json("Ok");
+            response.status(204);
         } catch (e) {
             response.status(500).json(e);
         }
     }
 
+    async getCategories(request, response) {
+        try {
+            const categories = await EventService.getCategories()
+
+            response.status(204).json(categories)
+        } catch (e) {
+            response.status(500).json(e);
+        }
+    }
+
+    async rateEvent(request, response) {
+        try {
+            const { eventId, userId, rating, text } = request.body
+            const review = await EventService.rateEvent({eventId, userId, rating, text});
+
+            response.status(200).json(review)
+        } catch (e) {
+            response.status(500).json(e)
+        }
+    }
+
+    async getReviewsByEventId(request, response) {
+        try {
+            const { eventId } = request.params.id;
+            const reviews = await EventService.getReviewsByEventId(eventId);
+
+            response.status(200).json(reviews)
+        } catch (e) {
+            response.status(500).json(e)
+        }
+    }
+
+    async getGroupsByEventId(request, response) {
+        try {
+            const { eventId } = request.params.id;
+            const groups = await EventService.getGroupsByEventId(eventId);
+
+            response.status(200).json(groups)
+        } catch (e) {
+            response.status(500).json(e)
+        }
+    }
+
     async leaveComment(request, response) {
         try {
-            const { userId, eventId, text } = request.body
-            const comment = await EventService.leaveComment({userId, eventId, text});
+            const { userId, discussionId, text} = request.body
+            const comment = await EventService.leaveComment({userId, discussionId, text});
 
             response.status(200).json(comment)
         } catch (e) {
@@ -103,10 +147,10 @@ class EventController {
         }
     }
 
-    async getComments(request, response) {
+    async getCommentsByGroupId(request, response) {
         try {
-            const { eventId } = request.body
-            const comments = await EventService.getComments({eventId});
+            const { eventId } = request.params.id;
+            const comments = await EventService.getCommentsByGroupId({eventId});
 
             response.status(200).json(comments)
         } catch (e) {

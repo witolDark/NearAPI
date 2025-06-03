@@ -4,12 +4,13 @@ export class EventDTO {
     title;
     description;
     startDate;
-    startTime;
     endDate;
-    endTime;
     location;
     ticketRequired;
     ticketUrl;
+    category;
+    rating;
+    numberOfRatings;
     status;
 
     constructor(model) {
@@ -24,6 +25,9 @@ export class EventDTO {
         this.location = model.location;
         this.ticketRequired = model.ticketRequired;
         this.ticketUrl = model.ticketUrl;
+        this.rating = model.rating;
+        this.numberOfRatings = model.numberOfRatings;
+        this.category = model.category;
         this.status = model.status;
     }
 }
