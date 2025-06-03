@@ -2566,3 +2566,16 @@
 /node_modules/wrappy/wrappy.js
 /node_modules/tar/lib/write-entry.js
 /node_modules/yallist/yallist.js
+/node_modules/.package-lock.json
+/node_modules/.bin/color-support.ps1
+/node_modules/.bin/mime.ps1
+/node_modules/.bin/mkdirp.ps1
+/node_modules/.bin/node-pre-gyp.ps1
+/node_modules/.bin/nodemon.ps1
+/node_modules/.bin/nodetouch.ps1
+/node_modules/.bin/nopt.ps1
+/package-lock.json
+/node_modules/.bin/rimraf.ps1
+/node_modules/.bin/semver.ps1
+/node_modules/make-dir/node_modules/.bin/semver.ps1
+/node_modules/.bin/uuid.ps1

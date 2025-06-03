@@ -8,6 +8,7 @@ export class EventDTO {
     location;
     ticketRequired;
     ticketUrl;
+    categoryId;
     category;
     rating;
     numberOfRatings;
@@ -27,6 +28,7 @@ export class EventDTO {
         this.ticketUrl = model.ticketUrl;
         this.rating = model.rating;
         this.numberOfRatings = model.numberOfRatings;
+        this.categoryId = model.categoryId;
         this.category = model.category;
         this.status = model.status;
     }

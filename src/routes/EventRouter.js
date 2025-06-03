@@ -15,6 +15,8 @@ eventRouter.delete('/events/:id', EventController.delete)
 
 eventRouter.post('/review', EventController.rateEvent)
 eventRouter.get('/reviews/event/:id', EventController.getReviewsByEventId)
+eventRouter.post('/groups', EventController.createGroup)
+eventRouter.get('/groups/:id', EventController.getGroup)
 eventRouter.get('/groups/event/:id', EventController.getGroupsByEventId)
 eventRouter.post('/groups/comments', EventController.leaveComment)
 eventRouter.get('/comments/group/:id', EventController.getCommentsByGroupId)

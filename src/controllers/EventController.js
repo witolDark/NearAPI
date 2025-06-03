@@ -97,7 +97,7 @@ class EventController {
         try {
             const categories = await EventService.getCategories()
 
-            response.status(204).json(categories)
+            response.status(200).json(categories)
         } catch (e) {
             response.status(500).json(e);
         }
@@ -125,10 +125,29 @@ class EventController {
         }
     }
 
+    async createGroup(request, response) {
+        try {
+            const group = await EventService.createGroup(request.body);
+
+            response.status(200).json(group)
+        } catch (e) {
+            response.status(500).json(e)
+        }
+    }
+
+    async getGroup(request, response) {
+        try {
+            const group = await EventService.getGroup(request.params.id);
+
+            response.status(200).json(group)
+        } catch (e) {
+            response.status(500).json(e)
+        }
+    }
+
     async getGroupsByEventId(request, response) {
         try {
-            const { eventId } = request.params.id;
-            const groups = await EventService.getGroupsByEventId(eventId);
+            const groups = await EventService.getGroupsByEventId(request.params.id);
 
             response.status(200).json(groups)
         } catch (e) {
@@ -138,8 +157,8 @@ class EventController {
 
     async leaveComment(request, response) {
         try {
-            const { userId, discussionId, text} = request.body
-            const comment = await EventService.leaveComment({userId, discussionId, text});
+            const { userId, groupId, text } = request.body
+            const comment = await EventService.leaveComment({userId, groupId, text});
 
             response.status(200).json(comment)
         } catch (e) {
@@ -149,8 +168,7 @@ class EventController {
 
     async getCommentsByGroupId(request, response) {
         try {
-            const { eventId } = request.params.id;
-            const comments = await EventService.getCommentsByGroupId({eventId});
+            const comments = await EventService.getCommentsByGroupId(request.params.id);
 
             response.status(200).json(comments)
         } catch (e) {

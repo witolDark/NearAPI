@@ -80,6 +80,15 @@ class EventService {
             eventId, userId, rating, text, date: Date.now()
         });
 
+        const event = new EventDTO(await Event.findById({eventId}).lean());
+        event.numberOfRatings++;
+        const reviews = await Review.find({eventId: eventId}).lean().map(review => new ReviewDTO(review));
+        let reviewSum = 0;
+        for (const review in reviews) {
+            reviewSum += review.rating;
+        }
+        event.rating = reviewSum / event.numberOfRatings
+
         const populatedReview = await Review.findById(review._id)
             .populate('eventId')
             .populate('userId')
@@ -94,24 +103,42 @@ class EventService {
         return reviews.map(review => new ReviewDTO(review));
     }
 
-    async getGroupsByEventId(eventId) {
-        return await Group.find({eventId: eventId}).populate('userId').lean().map(group => new GroupDTO(group));
+    async createGroup(eventData) {
+        const group = await Group.create({
+            ...eventData
+        });
+
+        const populatedGroup = await Group.findById(group._id).populate('userId').lean();
+
+        return new GroupDTO(populatedGroup);
     }
 
-    async leaveComment(userId, groupId, text) {
+    async getGroup(groupId) {
+        return new GroupDTO(await Group.findById(groupId).populate('userId').lean());
+    }
+
+    async getGroupsByEventId(eventId) {
+        const groups = await Group.find({eventId: eventId}).populate('userId').lean();
+        return groups.map(group => new GroupDTO(group));
+    }
+
+    async leaveComment({userId, groupId, text}) {
         const comment = await Comment.create({groupId, userId, text});
         const user = await UserService.getUser(userId);
-        const group = await Group.findById(groupId);
+        const group = new GroupDTO(await Group.findById(groupId).lean());
 
         return new CommentDTO({...comment, user, group});
     }
 
     async getCommentsByGroupId(groupId) {
-        const group = new GroupDTO(Group.findById({groupId}).lean());
-        const comments = Comment.find({groupId: groupId}).populate('userId').lean().map(comment => new CommentDTO(comment));
+        const group = new GroupDTO(await Group.findById(groupId).lean());
+        const comments = await Comment.find({groupId: groupId}).populate('userId').lean();
+        console.log(comments);
+        const populatedComments = comments.map(comment => new CommentDTO(comment))
+        console.log(populatedComments);
         return {
             group,
-            comments
+            populatedComments
         }
     }
 

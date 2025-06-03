@@ -110,7 +110,7 @@ class UserService {
     }
 
     async getUser(userId) {
-        const user = await User.findOne({userId})
+        const user = await User.findById(userId).lean();
 
         return new UserDTO(user)
     }

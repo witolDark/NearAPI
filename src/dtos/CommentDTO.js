@@ -6,8 +6,8 @@ export class CommentDTO {
 
     constructor(model) {
         this.id = model._id;
-        this.group = model.group;
-        this.user = model.user;
+        this.group = model.groupId;
+        this.user = model.userId;
         this.text = model.text;
     }
 }
