@@ -45,15 +45,19 @@ class EventService {
     }
 
     async getAllEvents() {
-        return Event.find({
+        const events = await Event.find({
             status: {$nin: [Status.PENDING, Status.CANCELLED]}
-        }).populate('categoryId').lean().map(event => new EventDTO(event));
+        }).populate('categoryId').lean();
+
+        return events.map(event => new EventDTO(event));
     }
 
     async getAllPendings() {
-        return Event.find({
+        const events = await Event.find({
             status: Status.PENDING
-        }).lean().map(event => new EventDTO(event));
+        }).populate('categoryId').lean();
+
+        return events.map(event => new EventDTO(event));
     }
 
     async deleteEvent(id) {
@@ -99,7 +103,6 @@ class EventService {
 
     async getReviewsByEventId(eventId) {
         const reviews = await Review.find({eventId: eventId}).populate('eventId').populate('userId').lean();
-        console.log(reviews);
         return reviews.map(review => new ReviewDTO(review));
     }
 
@@ -140,7 +143,7 @@ class EventService {
         }
     }
 
-    async deleteComment(commentId, userId) {
+    async deleteComment({commentId, userId}) {
         const user = await UserService.getUser(userId);
         const comment = await Comment.findById(commentId);
 
@@ -152,8 +155,8 @@ class EventService {
             throw new Error(`Could not find a user with id ${userId}`);
         }
 
-        if (user._id.equals(comment.userId) || user.role === Role.ADMIN) {
-            Comment.findByIdAndDelete(commentId)
+        if (user.id.equals(comment.userId) || user.role === Role.ADMIN) {
+            return Comment.findByIdAndDelete(commentId);
         }
 
         throw new Error('No permission to delete');

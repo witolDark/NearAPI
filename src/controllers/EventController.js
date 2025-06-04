@@ -84,10 +84,9 @@ class EventController {
 
     async delete(request, response) {
         try {
-            const {id} = request.params.id
-            await EventService.deleteEvent(id)
+            await EventService.deleteEvent(request.params.id)
 
-            response.status(204);
+            response.status(204).end();
         } catch (e) {
             response.status(500).json(e);
         }
@@ -177,7 +176,8 @@ class EventController {
 
     async deleteComment(request, response) {
         try {
-            const { commentId, userId } = request.body
+            const commentId = request.params.id;
+            const userId = request.query.userId;
             const result = await EventService.deleteComment({commentId, userId});
 
             response.status(200).json(result)
