@@ -36,7 +36,6 @@ class EventService {
 
     async getEvent(id) {
         const event = await Event.findById(id).populate('categoryId').lean();
-
         return new EventDTO(event);
     }
 
@@ -80,14 +79,15 @@ class EventService {
             eventId, userId, rating, text, date: Date.now()
         });
 
-        const event = new EventDTO(await Event.findById({eventId}).lean());
+        const event = await Event.findById(eventId);
         event.numberOfRatings++;
-        const reviews = await Review.find({eventId: eventId}).lean().map(review => new ReviewDTO(review));
+        const reviews = await Review.find({eventId: eventId});
         let reviewSum = 0;
-        for (const review in reviews) {
+        for (const review of reviews) {
             reviewSum += review.rating;
         }
         event.rating = reviewSum / event.numberOfRatings
+        event.save();
 
         const populatedReview = await Review.findById(review._id)
             .populate('eventId')
@@ -99,7 +99,7 @@ class EventService {
 
     async getReviewsByEventId(eventId) {
         const reviews = await Review.find({eventId: eventId}).populate('eventId').populate('userId').lean();
-
+        console.log(reviews);
         return reviews.map(review => new ReviewDTO(review));
     }
 
@@ -133,9 +133,7 @@ class EventService {
     async getCommentsByGroupId(groupId) {
         const group = new GroupDTO(await Group.findById(groupId).lean());
         const comments = await Comment.find({groupId: groupId}).populate('userId').lean();
-        console.log(comments);
         const populatedComments = comments.map(comment => new CommentDTO(comment))
-        console.log(populatedComments);
         return {
             group,
             populatedComments

@@ -116,8 +116,7 @@ class EventController {
 
     async getReviewsByEventId(request, response) {
         try {
-            const { eventId } = request.params.id;
-            const reviews = await EventService.getReviewsByEventId(eventId);
+            const reviews = await EventService.getReviewsByEventId(request.params.id);
 
             response.status(200).json(reviews)
         } catch (e) {

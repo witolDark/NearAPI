@@ -1,14 +1,14 @@
 export class ReviewDTO {
     id;
-    user
+    userI
     event;
     text;
     rating;
 
     constructor(model) {
         this.id = model._id;
-        this.user = model.user;
-        this.event = model.event;
+        this.user = model.userId;
+        this.event = model.eventId;
         this.text = model.text;
         this.rating = model.rating;
     }
