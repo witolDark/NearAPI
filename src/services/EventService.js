@@ -14,11 +14,13 @@ import User from "../models/User.js";
 
 class EventService {
     async addEvent(eventData) {
-        const user = await User.find({creator: eventData.creator});
+        console.log(eventData);
+        const user = await User.findOne({name: eventData.creator});
+        console.log(user);
+        eventData.userId = user._id
 
         const event = await Event.create({
-            ...eventData,
-            userId: user._id
+            ...eventData
         });
 
         return new EventDTO(event);

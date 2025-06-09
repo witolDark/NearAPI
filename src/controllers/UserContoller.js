@@ -6,7 +6,7 @@ class UserController {
             const {email, name, password} = request.body
             await userService.register(email, name, password)
 
-            return response.status(200)
+            return response.status(200).end();
         } catch (e) {
             return response.json(e.message)
         }
