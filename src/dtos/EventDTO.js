@@ -1,5 +1,6 @@
 export class EventDTO {
     id;
+    userId;
     creator;
     title;
     description;
@@ -17,6 +18,7 @@ export class EventDTO {
     constructor(model) {
         this.id = model._id;
         this.creator = model.creator;
+        this.userId = model.userId;
         this.title = model.title;
         this.description = model.description;
         this.startDate = model.startDate;

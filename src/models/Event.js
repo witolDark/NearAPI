@@ -2,6 +2,7 @@ import mongoose, {Schema} from 'mongoose';
 import Status from "../shared/Status.js";
 
 const EventSchema = new mongoose.Schema({
+    userId: { type: Schema.Types.ObjectId, required: true, ref: 'User'},
     creator: {type: String, required: true},
     title: {type: String, required: true},
     description: {type: String, required: true},

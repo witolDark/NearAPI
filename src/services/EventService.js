@@ -10,11 +10,15 @@ import {GroupDTO} from "../dtos/GroupDTO.js";
 import Review from "../models/Review.js";
 import {ReviewDTO} from "../dtos/ReviewDTO.js";
 import Category from "../models/Category.js";
+import User from "../models/User.js";
 
 class EventService {
     async addEvent(eventData) {
+        const user = await User.find({creator: eventData.creator});
+
         const event = await Event.create({
             ...eventData,
+            userId: user._id
         });
 
         return new EventDTO(event);
